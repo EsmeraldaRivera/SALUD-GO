@@ -29,6 +29,7 @@ app.get(`/Api/Medicos/`,(req, res) => {
   }
   res.json(Medico);
 });
+//post- crear una nueva especialidad
 
 
 
