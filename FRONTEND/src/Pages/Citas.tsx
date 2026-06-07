@@ -1,78 +1,94 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../Context/AppContext";
+import { useNavigate } from "react-router-dom";
 
 function Citas() {
-  const [citas, setCitas] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  // 🔥 CONTEXTO GLOBAL (IMPORTANTE)
+  const { citas, setCitas } = useContext(AppContext);
 
   const [motivo, setMotivo] = useState("");
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
 
+  // 🕒 Horarios con disponibilidad
   const horarios = [
-    "08:00 AM",
-    "09:00 AM",
-    "10:00 AM",
-    "11:00 AM",
-    "12:00 PM",
-    "02:00 PM",
-    "03:00 PM",
-    "04:00 PM",
-    "05:00 PM",
+    { hora: "08:00 AM", disponible: true },
+    { hora: "09:00 AM", disponible: false },
+    { hora: "10:00 AM", disponible: true },
+    { hora: "11:00 AM", disponible: false },
+    { hora: "12:00 PM", disponible: true },
+    { hora: "02:00 PM", disponible: true },
+    { hora: "03:00 PM", disponible: false },
+    { hora: "04:00 PM", disponible: true },
+    { hora: "05:00 PM", disponible: false },
   ];
 
-  // ➜ AGREGAR CITA
+  // 📅 FECHA ALEATORIA
+  const generarFechaAleatoria = () => {
+    const dias = [3, 5, 7, 10, 12, 15, 18];
+    const random = dias[Math.floor(Math.random() * dias.length)];
+
+    const fechaBase = new Date();
+    fechaBase.setDate(fechaBase.getDate() + random);
+
+    return fechaBase.toISOString().split("T")[0];
+  };
+
+  // 💾 GUARDAR CITA
   const agregarCita = () => {
     if (!motivo || !fecha || !hora) return;
+
+    const horario = horarios.find((h) => h.hora === hora);
+
+    if (!horario?.disponible) {
+      alert("❌ Esta hora no está disponible");
+      return;
+    }
 
     const nuevaCita = {
       id: Date.now(),
       motivo,
-      fecha,
+      fecha: generarFechaAleatoria(),
       hora,
     };
 
     setCitas([...citas, nuevaCita]);
+
+    alert("✅ Tu cita ha sido asignada exitosamente");
 
     setMotivo("");
     setFecha("");
     setHora("");
   };
 
-  // ➜ CANCELAR CITA
+  // ❌ CANCELAR
   const cancelarCita = (id: number) => {
-    setCitas(citas.filter((c) => c.id !== id));
+    setCitas(citas.filter((c: any) => c.id !== id));
   };
 
-  // ➜ REPROGRAMAR CITA (simulación simple)
-  const reprogramarCita = (id: number) => {
-    const nuevaHora = prompt("Ingresa nueva hora (ej: 10:00 AM)");
-
-    if (!nuevaHora) return;
-
-    setCitas(
-      citas.map((c) =>
-        c.id === id ? { ...c, hora: nuevaHora } : c
-      )
-    );
+  // 🔄 REPROGRAMAR
+  const reprogramarCita = () => {
+    alert("📌 Ve al formulario para reagendar tu cita");
   };
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>📅 Mis Citas Médicas</h1>
 
-      {/* SI NO HAY CITAS */}
-      {citas.length === 0 ? (
-        <div style={styles.empty}>
-          <p>No tienes citas programadas.</p>
+      {/* 🔙 REGRESAR */}
+      <button onClick={() => navigate("/menu")} style={styles.backButton}>
+        ⬅ Regresar al menú
+      </button>
 
-          <button
-            onClick={() => alert("Ve al formulario para agendar")}
-            style={styles.newButton}
-          >
-            ➕ Agendar nueva cita
-          </button>
-        </div>
+      {/* 📭 MENSAJE SI NO HAY CITAS */}
+      {citas.length === 0 ? (
+        <p style={{ marginTop: "20px" }}>
+          No tienes citas programadas.
+        </p>
       ) : (
-        citas.map((cita) => (
+        citas.map((cita: any) => (
           <div key={cita.id} style={styles.card}>
             <p><strong>Especialidad:</strong> {cita.motivo}</p>
             <p><strong>Fecha:</strong> {cita.fecha}</p>
@@ -87,7 +103,7 @@ function Citas() {
               </button>
 
               <button
-                onClick={() => reprogramarCita(cita.id)}
+                onClick={reprogramarCita}
                 style={styles.reprogramar}
               >
                 Reprogramar
@@ -97,7 +113,7 @@ function Citas() {
         ))
       )}
 
-      {/* FORMULARIO */}
+      {/* 📝 FORMULARIO */}
       <div style={styles.form}>
         <select
           value={motivo}
@@ -105,10 +121,20 @@ function Citas() {
           style={styles.input}
         >
           <option value="">Especialidad</option>
+
+          {/* 🏥 MÁS ESPECIALIDADES */}
           <option value="Medicina general">Medicina general</option>
           <option value="Cardiología">Cardiología</option>
           <option value="Pediatría">Pediatría</option>
           <option value="Dermatología">Dermatología</option>
+          <option value="Ginecología">Ginecología</option>
+          <option value="Neurología">Neurología</option>
+          <option value="Odontología">Odontología</option>
+          <option value="Oftalmología">Oftalmología</option>
+          <option value="Psicología">Psicología</option>
+          <option value="Traumatología">Traumatología</option>
+          <option value="Urología">Urología</option>
+          <option value="Endocrinología">Endocrinología</option>
         </select>
 
         <input
@@ -125,13 +151,16 @@ function Citas() {
         >
           <option value="">Hora</option>
           {horarios.map((h) => (
-            <option key={h} value={h}>
-              {h}
+            <option
+              key={h.hora}
+              value={h.hora}
+              disabled={!h.disponible}
+            >
+              {h.hora} {h.disponible ? "" : "❌ No disponible"}
             </option>
           ))}
         </select>
 
-        {/* GUARDAR */}
         <button onClick={agregarCita} style={styles.save}>
           💾 Guardar cita
         </button>
@@ -150,7 +179,16 @@ const styles = {
 
   title: {
     color: "#0a3d62",
-    marginBottom: "20px",
+  },
+
+  backButton: {
+    margin: "10px",
+    padding: "10px",
+    background: "#0a3d62",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
   },
 
   form: {
@@ -179,7 +217,6 @@ const styles = {
   actions: {
     display: "flex",
     justifyContent: "space-between",
-    marginTop: "10px",
   },
 
   cancel: {
@@ -205,20 +242,6 @@ const styles = {
     color: "white",
     border: "none",
     padding: "10px",
-    borderRadius: "8px",
-    cursor: "pointer",
-  },
-
-  empty: {
-    marginTop: "20px",
-  },
-
-  newButton: {
-    marginTop: "10px",
-    padding: "10px",
-    background: "#0a3d62",
-    color: "white",
-    border: "none",
     borderRadius: "8px",
     cursor: "pointer",
   },

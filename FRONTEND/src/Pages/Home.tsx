@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
-  const [mensaje, setMensaje] = useState("Bienvenida a SaludGO");
+  const [mensaje, setMensaje] = useState("👋Bienvenidos✨, ¡tu salud en un clic!");
   const navigate = useNavigate();
 
   return (
@@ -12,6 +12,7 @@ function Home() {
 
         <p style={styles.subtitle}>{mensaje}</p>
 
+        {/* BOTÓN LOGIN */}
         <button
           style={styles.primaryButton}
           onClick={() => navigate("/login")}
@@ -19,12 +20,11 @@ function Home() {
           Iniciar sesión
         </button>
 
-        <button
-          style={styles.secondaryButton}
-          onClick={() => setMensaje("Gracias por confiar en SaludGO 💙")}
-        >
-          Cambiar mensaje
-        </button>
+        {/* TEXTO FIJO */}
+        <p style={styles.footerText}>
+          Gracias por confiar en SaludGO 💙
+        </p>
+
       </div>
     </div>
   );
@@ -32,6 +32,7 @@ function Home() {
 
 export default Home;
 
+/* 🎨 ESTILOS */
 const styles = {
   background: {
     height: "100vh",
@@ -82,5 +83,13 @@ const styles = {
     borderRadius: "10px",
     cursor: "pointer",
     fontSize: "14px",
+    marginTop: "10px",
+  },
+
+  footerText: {
+    marginTop: "15px",
+    color: "#0a3d62",
+    fontSize: "14px",
+    fontWeight: "500",
   },
 };
