@@ -1,0 +1,16 @@
+{
+  "name": "salud-go",
+  "version": "1.0.0",
+  "description": "Gestion de citas medicas",
+  "repository": {
+    "type": "git",
+    "url": "cd FRONTEND"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "y"
+  }
+}

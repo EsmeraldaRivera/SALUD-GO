@@ -28,7 +28,7 @@ function Perfil() {
             Nombre:
           </p>
           <p style={styles.value}>
-            {usuario?.nombre || "Usuario no registrado"}
+            {usuario?.nombre || "Maria Diaz"}
           </p>
 
           <p style={styles.label}>
